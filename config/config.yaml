@@ -1,0 +1,16 @@
+# Application configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  timeout: 30s
+
+database:
+  host: localhost
+  port: 5432
+  name: taskmanager
+  max_connections: 100
+  idle_connections: 10
+
+logging:
+  level: info
+  format: json
