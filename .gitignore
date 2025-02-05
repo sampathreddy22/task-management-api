@@ -23,3 +23,11 @@ go.work.sum
 
 # env file
 .env
+
+# Environment files
+.env.local
+.env.*.local
+
+# Keep example env file
+!.env.example
+.history
