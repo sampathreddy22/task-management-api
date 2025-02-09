@@ -1,0 +1,377 @@
+basePath: /api/v1
+definitions:
+  models.Attachment:
+    properties:
+      fileName:
+        type: string
+      filePath:
+        description: s3 URL or local path
+        type: string
+      id:
+        type: string
+      taskID:
+        type: string
+      uploadedAt:
+        type: string
+    type: object
+  models.AttachmentInput:
+    properties:
+      fileName:
+        type: string
+      filePath:
+        type: string
+      taskId:
+        type: string
+    required:
+    - fileName
+    - filePath
+    - taskId
+    type: object
+  models.Comment:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      taskID:
+        type: string
+      userID:
+        type: string
+    type: object
+  models.Task:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/models.Attachment'
+        type: array
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      createdAt:
+        type: string
+      description:
+        type: string
+      dueDate:
+        type: string
+      id:
+        type: string
+      priority:
+        type: integer
+      status:
+        description: '"todo", "in progress", "done"'
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        description: Foreign key
+        type: string
+    type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      passwordHash:
+        type: string
+      role:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/models.Task'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.UserInput:
+    description: User input model for creation and updates
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        enum:
+        - user
+        - admin
+        type: string
+    required:
+    - email
+    - password
+    - role
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A simple task management API
+  title: Task Management API
+  version: "1.0"
+paths:
+  /attachments:
+    post:
+      consumes:
+      - application/json
+      description: Create a new attachment with the given input
+      parameters:
+      - description: The input for the attachment
+        in: body
+        name: attachment
+        required: true
+        schema:
+          $ref: '#/definitions/models.AttachmentInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Attachment'
+      summary: Create a new attachment
+      tags:
+      - attachments
+  /attachments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an attachment with the given ID
+      parameters:
+      - description: The ID of the attachment to delete
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete an attachment
+      tags:
+      - attachments
+    get:
+      consumes:
+      - application/json
+      description: Get an attachment by ID
+      parameters:
+      - description: The ID of the attachment to get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Attachment'
+      summary: Get an attachment by ID
+      tags:
+      - attachments
+    put:
+      consumes:
+      - application/json
+      description: Update an attachment with the given input
+      parameters:
+      - description: The ID of the attachment to update
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: The input for the attachment
+        in: body
+        name: attachment
+        required: true
+        schema:
+          $ref: '#/definitions/models.AttachmentInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Attachment'
+      summary: Update an attachment
+      tags:
+      - attachments
+  /attachments/task/{taskId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all attachments for a task
+      parameters:
+      - description: The ID of the task to get attachments for
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Attachment'
+            type: array
+      summary: Get all attachments for a task
+      tags:
+      - attachments
+  /tasks:
+    get:
+      consumes:
+      - application/json
+      description: Get all tasks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+      summary: Get all tasks
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: Create a new task with the given title and description
+      parameters:
+      - description: Task to create
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: Create a new task
+      tags:
+      - tasks
+  /tasks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a task
+      tags:
+      - tasks
+    get:
+      consumes:
+      - application/json
+      description: Get a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: Get a task by ID
+      tags:
+      - tasks
+    put:
+      consumes:
+      - application/json
+      description: Update a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Task to update
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: Update a task
+      tags:
+      - tasks
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the given name and email
+      parameters:
+      - description: UserInput to create user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Get a user by ID
+      tags:
+      - users
+schemes:
+- http
+- https
+swagger: "2.0"
