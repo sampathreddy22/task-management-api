@@ -31,3 +31,5 @@ go.work.sum
 # Keep example env file
 !.env.example
 .history
+cmd/__debug_bin1616682248
+.vscode

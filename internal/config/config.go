@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -31,21 +32,13 @@ func Load() (*Config, error) {
 	v.AddConfigPath("../config")
 	v.AddConfigPath("../../config")
 
-	//Read YAML config file
 	if err := v.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
+	// Load environment variables from .env file
 
-	// Load .env file for secrets
-	v.SetConfigName(".env")
-	v.SetConfigType("env")
-	v.AddConfigPath(".")
-	v.AddConfigPath("../")
-	v.AddConfigPath("../../")
-
-	//Read .env file
-	if err := v.MergeInConfig(); err != nil {
-		return nil, fmt.Errorf("failed to merge .env file: %w", err)
+	if err := godotenv.Load(); err != nil {
+		return nil, fmt.Errorf("error loading .env file: %w", err)
 	}
 
 	var cfg Config
@@ -58,7 +51,7 @@ func Load() (*Config, error) {
 }
 
 func Validate(cfg *Config) error {
-	if cfg.Database.User == "" || cfg.Database.Password == "" || cfg.Database.Host == "" || cfg.Database.Name == "" {
+	if cfg.Database.DBUser == "" || cfg.Database.DBPassword == "" || cfg.Database.Host == "" || cfg.Database.Name == "" {
 		return fmt.Errorf("database configuration is missing")
 	}
 

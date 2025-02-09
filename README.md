@@ -337,3 +337,14 @@ This structure gives you exposure to real-world patterns like:
 - Graceful shutdown
 - Structured logging
 - Distributed tracing (OpenTelemetry)
+
+### **How to add swagger documentation**
+
+1. Install the following packages:
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+go get github.com/swaggo/gin-swagger
+go get github.com/swaggo/files
+```
+2. Run ``` swag init cmd/main.go``` to generate the swagger documentation
