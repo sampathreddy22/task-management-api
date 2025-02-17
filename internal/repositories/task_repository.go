@@ -18,6 +18,7 @@ type TaskRepository interface {
 		query string,
 		offset, limit int,
 	) ([]models.Task, error)
+	GetAll(ctx context.Context, offset, limit int) ([]models.Task, error)
 }
 
 type taskRepository struct {
@@ -66,6 +67,14 @@ func (r *taskRepository) search(ctx context.Context, query string, offset, limit
 		Offset(offset).
 		Limit(limit).
 		Find(&tasks).Error; err != nil {
+		return nil, err
+	}
+	return tasks, nil
+}
+
+func (r *taskRepository) GetAll(ctx context.Context, offset, limit int) ([]models.Task, error) {
+	var tasks []models.Task
+	if err := r.db.WithContext(ctx).Offset(offset).Limit(limit).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	return tasks, nil

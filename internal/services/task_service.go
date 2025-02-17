@@ -32,3 +32,15 @@ func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task) error {
 func (s *TaskService) DeleteTask(ctx context.Context, id string) error {
 	return s.taskRepo.Delete(ctx, id)
 }
+
+func (s *TaskService) GetTasksByUserID(ctx context.Context, userID string, offset, limit int) ([]models.Task, error) {
+	return s.taskRepo.GetByUserID(ctx, userID, offset, limit)
+}
+
+func (s *TaskService) GetTasksByStatus(ctx context.Context, status string, offset, limit int) ([]models.Task, error) {
+	return s.taskRepo.GetByStatus(ctx, status, offset, limit)
+}
+
+func (s *TaskService) GetTasks(ctx context.Context, offset, limit int) ([]models.Task, error) {
+	return s.taskRepo.GetAll(ctx, offset, limit)
+}

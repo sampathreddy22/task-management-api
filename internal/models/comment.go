@@ -7,9 +7,13 @@ import (
 )
 
 type Comment struct {
-	ID        uuid.UUID
+	ID        uuid.UUID `gorm:"type:uuid;primary_key"`
 	Content   string
 	CreatedAt time.Time
-	TaskID    uuid.UUID
-	UserID    uuid.UUID
+	TaskID    uuid.UUID `gorm:"type:uuid"`
+	UserID    uuid.UUID `gorm:"type:uuid"`
+}
+
+func (c *Comment) TableName() string {
+	return "comments"
 }
