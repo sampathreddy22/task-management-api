@@ -33,3 +33,4 @@ go.work.sum
 .history
 cmd/__debug_bin1616682248
 .vscode
+cmd/*

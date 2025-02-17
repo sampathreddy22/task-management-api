@@ -182,9 +182,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/tasks": {
-            "get": {
-                "description": "Get all tasks",
+        "/comments": {
+            "post": {
+                "description": "Add a new comment to a task",
                 "consumes": [
                     "application/json"
                 ],
@@ -192,9 +192,89 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
+                    "comments"
+                ],
+                "summary": "Add a new comment to a task",
+                "parameters": [
+                    {
+                        "description": "Comment to add",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/{taskID}": {
+            "get": {
+                "description": "Get comments by task ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Get comments by task ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Comment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "get": {
+                "description": "Get all tasks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
                     "tasks"
                 ],
                 "summary": "Get all tasks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -522,9 +602,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "passwordHash": {
                     "type": "string"
                 },
                 "role": {

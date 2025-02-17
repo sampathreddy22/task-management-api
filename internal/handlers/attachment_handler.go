@@ -25,7 +25,7 @@ func NewAttachmentHandler(service *services.AttachmentService) *AttachmentHandle
 // @Success 201 {object} models.Attachment
 // @Router /attachments [post]
 // @tags attachments
-func (h *AttachmentHandler) CreateAttachment(c *gin.Context) {
+func (h *AttachmentHandler) AddAttachment(c *gin.Context) {
 	var input models.AttachmentInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -55,6 +56,14 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 // @Router /tasks/{id} [get]
 // @tags tasks
 func (h *TaskHandler) GetTaskByID(c *gin.Context) {
+	id := c.Param("id")
+	task, err := h.taskService.GetTaskByID(context.Background(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, task)
 
 }
 
@@ -68,7 +77,29 @@ func (h *TaskHandler) GetTaskByID(c *gin.Context) {
 // @Router /tasks/{id} [put]
 // @tags tasks
 func (h *TaskHandler) UpdateTask(c *gin.Context) {
+	id := c.Param("id")
+	var task models.Task
+	if err := c.ShouldBindJSON(&task); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
+	// Convert string ID to UUID
+	taskID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid task ID"})
+		return
+	}
+
+	task.ID = taskID
+	task.UpdatedAt = time.Now()
+
+	if err := h.taskService.UpdateTask(context.Background(), &task); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, task)
 }
 
 // @Summary Delete a task
@@ -80,16 +111,46 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 // @Router /tasks/{id} [delete]
 // @tags tasks
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.taskService.DeleteTask(context.Background(), id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // @Summary Get all tasks
 // @Description Get all tasks
-// @Accept json
+// @Param offset query int false "Offset"
+// @Param limit query int false "Limit"
 // @Produce json
 // @Success 200 {array} models.Task
 // @Router /tasks [get]
 // @tags tasks
 func (h *TaskHandler) GetTasks(c *gin.Context) {
+	// Parse pagination parameters with defaults
+	offsetInt := 0
+	if offset := c.Query("offset"); offset != "" {
+		if val, err := strconv.Atoi(offset); err == nil {
+			offsetInt = val
+		}
+	}
 
+	limitInt := 10 // Default limit
+	if limit := c.Query("limit"); limit != "" {
+		if val, err := strconv.Atoi(limit); err == nil {
+			limitInt = val
+		}
+	}
+
+	// Get tasks with pagination
+	ctx := c.Request.Context()
+	tasks, err := h.taskService.GetTasks(ctx, offsetInt, limitInt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, tasks)
 }

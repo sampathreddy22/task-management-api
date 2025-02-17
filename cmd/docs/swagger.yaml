@@ -79,8 +79,6 @@ definitions:
         type: string
       id:
         type: string
-      passwordHash:
-        type: string
       role:
         type: string
       tasks:
@@ -225,11 +223,63 @@ paths:
       summary: Get all attachments for a task
       tags:
       - attachments
-  /tasks:
+  /comments:
+    post:
+      consumes:
+      - application/json
+      description: Add a new comment to a task
+      parameters:
+      - description: Comment to add
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Comment'
+      summary: Add a new comment to a task
+      tags:
+      - comments
+  /comments/{taskID}:
     get:
       consumes:
       - application/json
+      description: Get comments by task ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+      summary: Get comments by task ID
+      tags:
+      - comments
+  /tasks:
+    get:
       description: Get all tasks
+      parameters:
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
